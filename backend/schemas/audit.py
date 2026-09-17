@@ -5,12 +5,14 @@ from typing import Optional
 class AuditLogResponse(BaseModel):
     id: int
     user_id: Optional[int]
+    user_name: Optional[str] = None
+    user_email: Optional[str] = None
     case_id: Optional[int]
     document_id: Optional[int]
     action: str
     result: str
     ip_address: Optional[str]
-    details: Optional[str]  # Changed from metadata to details
+    details: Optional[str]
     previous_hash: Optional[str]
     current_hash: Optional[str]
     created_at: datetime

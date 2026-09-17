@@ -35,20 +35,24 @@ const CaseDetail = () => {
       setLoading(true);
       setError("");
 
-      const response = await api.get(
-        ENDPOINTS.CASES.DETAIL(id)
+      const [caseRes, docsRes] = await Promise.all([
+        api.get(ENDPOINTS.CASES.DETAIL(id)),
+        api.get(ENDPOINTS.DOCUMENTS.LIST),
+      ]);
+
+      // Filter docs belonging to this case
+      const caseDocs = docsRes.data.filter(
+        (doc) => String(doc.case_id) === String(id)
       );
 
-      setCaseData(response.data);
+      setCaseData({
+        ...caseRes.data,
+        documents: caseDocs,
+      });
     } catch (error) {
-      console.error(
-        "Failed to fetch case details:",
-        error
-      );
-
+      console.error("Failed to fetch case details:", error);
       setError(
-        error.response?.data?.detail ||
-          "Unable to load case details."
+        error.response?.data?.detail || "Unable to load case details."
       );
     } finally {
       setLoading(false);

@@ -5,9 +5,11 @@ from typing import Optional
 class DocumentResponse(BaseModel):
     id: int
     case_id: int
+    case_number: Optional[str] = None
     title: str
     document_type: str
     description: Optional[str]
+    file_path: Optional[str] = None
     file_size: int
     sha256_hash: str
     current_version: int

@@ -15,7 +15,7 @@ def save_uploaded_file(file: UploadFile, case_number: str, version: int = 1) -> 
     os.makedirs(case_folder, exist_ok=True)
 
     filename = f"v{version}_{file.filename}"
-    file_path = os.path.join(case_folder, filename)
+    file_path = os.path.join(case_folder, filename).replace("\\", "/")
 
     with open(file_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)

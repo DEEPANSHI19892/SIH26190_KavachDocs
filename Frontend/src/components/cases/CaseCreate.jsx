@@ -6,11 +6,10 @@ import { ENDPOINTS } from "../../api/endpoints";
 
 const CaseCreate = () => {
   const navigate = useNavigate();
-
-  const [form, setForm] = useState({
+    const [form, setForm] = useState({
     case_number: "",
     title: "",
-    type: "",
+    case_type: "",
     description: "",
     priority: "MEDIUM",
   });
@@ -38,11 +37,15 @@ const CaseCreate = () => {
       navigate(
         `/cases/${response.data.id}`
       );
+   
     } catch (error) {
-      console.error(
-        "Failed to create case",
-        error
+      console.error("Failed to create case", error);
+      alert(
+        error.response?.data?.detail
+          ? JSON.stringify(error.response.data.detail)
+          : "Failed to create case"
       );
+    
     } finally {
       setLoading(false);
     }
@@ -85,8 +88,8 @@ const CaseCreate = () => {
         />
 
         <input
-          name="type"
-          value={form.type}
+          name="case_type"
+          value={form.case_type}
           onChange={handleChange}
           placeholder="Case Type"
           className="w-full rounded-lg border border-slate-300 px-4 py-3"

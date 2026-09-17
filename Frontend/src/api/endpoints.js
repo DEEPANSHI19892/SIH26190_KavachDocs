@@ -12,6 +12,7 @@ export const ENDPOINTS = {
   },
 
   DOCUMENTS: {
+    LIST: "/documents",
     UPLOAD: "/documents/upload",
     DETAIL: (id) => `/documents/${id}`,
     DOWNLOAD: (id) => `/documents/${id}/download`,
