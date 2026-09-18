@@ -96,3 +96,7 @@ app.include_router(security.router)
 @app.get("/")
 def root():
     return {"message": "KavachDocs Backend Running!", "docs": "/docs"}
+
+@app.get("/health")
+def health_check():
+    return {"status": "healthy"}
