@@ -79,7 +79,10 @@ app = FastAPI(
 # CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # MVP — update with specific URLs in production
+    allow_origins=[
+    "http://localhost:5173",
+    "https://kavachdocs.vercel.app",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
