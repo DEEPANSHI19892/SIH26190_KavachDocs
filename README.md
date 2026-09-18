@@ -1,12 +1,33 @@
-# KavachDocs
+```markdown
+## KavachDocs
 
 ### Secure Digital Document & Case Management System
 
 > **Secure Documents. Trusted Evidence.**
 
-KavachDocs is a secure digital platform designed for managing **legal and investigation documents, cases, and evidence** in a centralized environment.
+KavachDocs is a secure digital platform for managing **legal and investigation documents, cases, and evidence** in a centralized environment.
 
-It focuses on **secure access, document integrity, audit trails, and evidence chain of custody**.
+It focuses on **secure access, cryptographic document integrity, tamper-evident audit trails, role-based access control, and evidence chain of custody**.
+
+---
+
+## 🌐 Live Deployment
+
+| Service | URL |
+|---------|-----|
+| **Frontend (App)** | [https://kavachdocs.vercel.app] |
+| **Backend API Docs** | [https://kavachdocs-backend.onrender.com/docs] |
+
+### 🔑 Demo Credentials
+
+Click any role on the login page to auto-fill credentials.
+
+| Role | Email | Password |
+|------|-------|----------|
+| Admin | `admin@kavachdocs.in` | `Admin@123` |
+| Investigation Officer | `officer@kavachdocs.in` | `Officer@123` |
+| Legal Officer | `legal@kavachdocs.in` | `Legal@123` |
+| Viewer | `viewer@kavachdocs.in` | `Viewer@123` |
 
 ---
 
@@ -26,7 +47,7 @@ Legal and investigation departments handle sensitive records such as:
 * Forensic reports
 * Legal notices and judgments
 
-Traditional or fragmented document management can create challenges such as:
+Traditional or fragmented document management creates challenges such as:
 
 * Unauthorized access
 * Unauthorized modification
@@ -36,7 +57,7 @@ Traditional or fragmented document management can create challenges such as:
 * Collaboration and access-control issues
 * Maintaining document integrity
 
-KavachDocs addresses these challenges through a centralized, security-focused platform.
+KavachDocs addresses these through a centralized, security-focused platform.
 
 ---
 
@@ -51,7 +72,6 @@ KavachDocs aims to:
 * Detect document tampering
 * Maintain a tamper-evident audit trail
 * Track evidence through chain of custody
-* Provide fast case, document and evidence search
 * Maintain document versions
 * Enable controlled collaboration between authorized users
 
@@ -60,43 +80,35 @@ KavachDocs aims to:
 ## 🚀 Key Features
 
 ### 🔐 Authentication
-
 * JWT-based authentication
-* Secure password hashing
+* bcrypt password hashing
 * Protected API endpoints
 * Failed-login tracking
+* Auto-logout on token expiry
 
 ### 👥 Role-Based Access Control
+Enforced at the backend level for every protected endpoint.
 
 Supported roles:
-
 * `ADMIN`
-* `INVESTIGATOR`
-* `SENIOR_OFFICER`
-* `FORENSIC_OFFICER`
+* `INVESTIGATION_OFFICER`
 * `LEGAL_OFFICER`
-
-Authorization is enforced at the backend level.
+* `VIEWER`
 
 ### 📁 Case Management
-
 * Create cases
 * View authorized cases
-* Update cases
-* Assign case members
-* Track case status
-* Manage case documents and evidence
+* Case types, priority, status
+* Assigned officer tracking
+* Case-level document aggregation
 
 ### 📄 Secure Document Management
-
 * Upload documents
-* Store document metadata
-* Secure document download
+* Auto-classification of document type (AI)
+* Secure download (bytes served from DB)
 * Document version tracking
-* File type validation
-* File size limits
-* UUID-based storage filenames
-* Private file storage
+* SHA-256 hashing on upload
+* Persistent storage in PostgreSQL (BYTEA)
 
 ### 🔏 Document Integrity
 
@@ -130,104 +142,55 @@ INTEGRITY VIOLATION
 
 ### 🧾 Audit Trail
 
-Important activities are recorded, including:
+Every important activity is recorded, including:
 
-* Login
-* Failed login
+* Login / failed login
 * Case creation
 * Document upload
-* Document access
+* Document view
 * Document download
-* Document modification
-* Evidence transfer
-* Integrity verification
+* Document verification
+* Version creation
 * Unauthorized access attempts
 
 ### 🔗 Tamper-Evident Audit Chain
 
-Audit events are connected using cryptographic hashes.
+Audit events are linked using cryptographic hashes.
 
 ```text
-Event 1
-  ↓
-Event 2
-  ↓
-Event 3
-  ↓
-Event 4
+Event 1 → Event 2 → Event 3 → Event 4
 ```
 
 Each event contains:
-
-* User
+* User ID
 * Action
-* Entity
+* Result (SUCCESS / FAILED / BLOCKED)
+* Entity references (case, document)
 * Timestamp
 * Previous hash
-* Event hash
+* Current hash
 
-The chain can be verified to detect unexpected modification.
+Modifying any historical event breaks the chain.
 
-### 🧪 Evidence Management
+### 🚨 Security Events
+* Auto-generated on blocked actions
+* Severity classification (LOW / MEDIUM / HIGH / CRITICAL)
+* Admin-only resolution workflow
+* Full RBAC-triggered alerting
 
-Evidence records include:
-
-* Evidence ID
-* Case ID
-* Evidence type
-* Description
-* Collector
-* Collection time
-* Current custodian
-* Status
-
-### 🔄 Chain of Custody
-
-Evidence transfers are recorded between authorized users.
-
-```text
-Officer A
-   ↓
-Evidence Transfer
-   ↓
-Officer B
-   ↓
-Evidence Transfer
-   ↓
-Officer C
-```
-
-Each transfer records:
-
-* From user
-* To user
-* Timestamp
-* Reason
-* Notes
-* Transfer hash
+### 🤖 AI Document Classifier
+Auto-detects document type from filename + title:
+* FIR / Witness Statement / Investigation Report / Evidence Record / Forensic Report / Charge Sheet / Court Filing / Legal Notice / Medical Report / Photograph / Audio / Video / Other
 
 ### 🔎 Search
-
-Search authorized records using:
-
-* Case number
-* FIR number
-* Document title
-* Document type
-* Evidence ID
-* Officer
-* Keywords
+Search authorized records using case number, document title, document type, or keywords.
 
 ### 📊 Dashboard
-
-The dashboard displays:
-
+Displays:
 * Total cases
 * Total documents
-* Total evidence
-* Recent activities
-* Security events
-* Integrity verification status
+* Total security events
+* Recent activity feed (from audit logs)
 
 ---
 
@@ -237,7 +200,7 @@ The dashboard displays:
               ┌──────────────────┐
               │     Frontend     │
               │ React + Vite +   │
-              │       CSS        │
+              │     Tailwind     │
               └────────┬─────────┘
                        │
                     REST API
@@ -249,12 +212,13 @@ The dashboard displays:
                       │
               ┌───────▼──────────┐
               │   PostgreSQL     │
+              │   (Neon Cloud)   │
               │   + SQLAlchemy   │
-              └──────────────────┘
+              └───────┬──────────┘
                       │
               ┌───────▼──────────┐
-              │  Private File    │
-              │     Storage      │
+              │  File Bytes in   │
+              │  BYTEA column    │
               └──────────────────┘
 ```
 
@@ -263,66 +227,73 @@ The dashboard displays:
 ## 🛠️ Technology Stack
 
 ### Frontend
-
 * React
 * Vite
 * JavaScript
-* CSS
+* Tailwind CSS
+* Axios
+* React Router
 
 ### Backend
-
 * Python
 * FastAPI
-* SQLAlchemy
+* SQLAlchemy 2.0
+* Pydantic
 
 ### Database
-
-* PostgreSQL
+* PostgreSQL (Neon — cloud)
+* SQLite (local development)
 
 ### Security
-
-* JWT
-* Argon2
+* JWT (python-jose)
+* bcrypt
 * SHA-256
 * Role-Based Access Control
 
-### Development
-
-* Node.js + npm
-* Git
-* GitHub
-* VS Code
-
 ### Deployment
+* Vercel (frontend)
+* Render (backend)
+* Neon (database)
+* UptimeRobot (health monitoring)
 
-* Vercel
-* Render
+### Development
+* Node.js + npm
+* Git + GitHub
+* VS Code
 
 ---
 
 ## 📂 Project Structure
 
 ```text
-kavachdocs/
+SIH26190_KavachDocs/
 │
-├── frontend/
+├── Frontend/
+│   ├── src/
+│   │   ├── api/               # axios.js, endpoints.js
+│   │   ├── components/        # auth, cases, documents, common
+│   │   ├── context/           # AuthContext
+│   │   ├── pages/             # Dashboard, Cases, Documents, Audit, Security
+│   │   └── main.jsx
+│   ├── public/
+│   │   └── favicon.svg
+│   ├── vercel.json            # SPA routing
+│   └── package.json
 │
 ├── backend/
-│   ├── app/
-│   └── tests/
+│   ├── main.py                # FastAPI app + auto-seed
+│   ├── config.py
+│   ├── database.py
+│   ├── seed_data.py
+│   ├── models/                # SQLAlchemy models
+│   ├── schemas/               # Pydantic schemas
+│   ├── security/              # JWT, hashing, RBAC
+│   ├── services/              # Business logic
+│   ├── routers/               # API endpoints
+│   ├── ai/                    # Document classifier
+│   ├── storage/
+│   └── requirements.txt
 │
-├── storage/
-│
-├── sample-data/
-│
-├── docs/
-│
-├── screenshots/
-│
-├── presentation/
-│
-├── .env.example
-├── .gitignore
 ├── README.md
 └── LICENSE
 ```
@@ -336,12 +307,10 @@ Core tables:
 ```text
 users
 cases
-case_members
 documents
 document_versions
-evidence
-evidence_transfers
 audit_logs
+security_events
 ```
 
 Relationship:
@@ -350,13 +319,11 @@ Relationship:
 Users
   │
   ├── Cases
-  │     ├── Case Members
   │     ├── Documents
-  │     │     └── Versions
-  │     ├── Evidence
-  │     │     └── Transfers
+  │     │     └── Document Versions
   │     └── Audit Logs
   │
+  ├── Security Events
   └── Audit Logs
 ```
 
@@ -365,98 +332,77 @@ Users
 ## 🔌 Core API
 
 ### Authentication
-
 ```text
 POST /auth/login
+POST /auth/register      (Admin only)
+GET  /auth/me
 ```
 
 ### Cases
-
 ```text
 GET  /cases
 POST /cases
 GET  /cases/{id}
-PUT  /cases/{id}
 ```
 
 ### Documents
-
 ```text
-POST /cases/{id}/documents
+POST /documents/upload
+GET  /documents
 GET  /documents/{id}
 GET  /documents/{id}/download
+POST /documents/{id}/verify
+POST /documents/{id}/version
 GET  /documents/{id}/versions
-POST /documents/{id}/verify-integrity
 ```
 
-### Evidence
-
+### Audit & Security
 ```text
-GET  /cases/{id}/evidence
-POST /evidence
-GET  /evidence/{id}
-POST /evidence/{id}/transfer
+GET  /audit-logs
+GET  /security-events
+POST /security-events/{id}/resolve    (Admin only)
 ```
 
-### Audit
-
+### Health
 ```text
-GET  /cases/{id}/audit
-POST /audit/verify-chain
+GET /health
 ```
 
-### Search
-
-```text
-GET /search
-```
-
-### Dashboard
-
-```text
-GET /dashboard/stats
-```
+Full interactive API documentation: [Swagger UI](https://kavachdocs-backend.onrender.com/docs)
 
 ---
 
 ## 🔒 Security
 
-KavachDocs follows basic secure-development practices.
-
 ### File Security
-
-* Allowed file extensions
-* File type validation
-* File size limits
-* Generated filenames
-* UUID-based storage names
-* Private storage
-* Backend authorization
-* Path traversal protection
-* No sensitive files in GitHub
+* MIME type captured on upload
+* Files stored as BYTEA in PostgreSQL
+* Private DB storage — no public file URLs
+* Backend authorization on every download
+* SHA-256 hash on every upload
+* Version-level hashing
 
 ### Authentication
-
-* Password hashing
-* JWT authentication
-* Protected routes
-* Token validation
-* Authentication-event logging
+* bcrypt password hashing (12 rounds)
+* JWT authentication (8-hour expiry)
+* Protected routes via dependency injection
+* Token validation on every request
+* Auth-event logging
 
 ### Authorization
 
-Every sensitive resource is checked on the backend.
+Every sensitive resource is checked on the backend:
 
 ```text
 User Request
      ↓
-Authenticate
+Authenticate (JWT)
      ↓
-Check Role
-     ↓
-Check Case Access
+Check Role (RBAC)
      ↓
 ALLOW / DENY
+     ↓
+If DENY → Log + Create Security Event
 ```
 
 ---
@@ -464,38 +410,35 @@ ALLOW / DENY
 ## 🧪 Demo Workflow
 
 ```text
-1. Login
-      ↓
-2. Open Case
-      ↓
-3. Upload Investigation Document
-      ↓
-4. Generate SHA-256 Hash
-      ↓
-5. View Document
-      ↓
-6. Verify Integrity
-      ↓
-7. INTEGRITY VERIFIED
-      ↓
-8. Attempt Unauthorized Access
-      ↓
-9. ACCESS DENIED
-      ↓
-10. View Audit Trail
-      ↓
-11. Add Evidence
-      ↓
-12. Transfer Evidence
-      ↓
-13. View Chain of Custody
-      ↓
-14. Verify Audit Chain
+1.  Login as Admin
+        ↓
+2.  View Dashboard (real stats from Neon)
+        ↓
+3.  Create Case
+        ↓
+4.  Upload Investigation Document
+        ↓
+5.  Auto-classify + Generate SHA-256 Hash
+        ↓
+6.  Verify Integrity → INTEGRITY VERIFIED
+        ↓
+7.  Download Document
+        ↓
+8.  Logout → Login as Viewer
+        ↓
+9.  Attempt Unauthorized Upload → ACCESS DENIED
+        ↓
+10. Login back as Admin
+        ↓
+11. View Security Events (auto-created)
+        ↓
+12. Resolve Security Event
+        ↓
+13. View Audit Trail (with hash chain)
 ```
 
-### Optional Tampering Demonstration
-
-Modify a sample document after upload and run integrity verification.
+### Optional Tampering Demo
+Modify a document hash in DB → run integrity verification.
 
 ```text
 Original Hash ≠ Current Hash
@@ -507,10 +450,9 @@ INTEGRITY VIOLATION
 
 ## 📦 Sample Data
 
-Only **synthetic/fictional demonstration data** should be used.
+Only **synthetic / fictional demonstration data** is used.
 
-Do not upload real:
-
+**Do not upload real:**
 * FIRs
 * Police records
 * Investigation documents
@@ -522,59 +464,59 @@ to the public repository or demo environment.
 
 ---
 
-## ⚡ MVP Scope
+## ✅ MVP — What Has Been Built
 
-### P0 — Must Have
+### Completed (P0)
 
-* Authentication
-* RBAC
-* Case management
-* Document upload
-* Secure document access
-* SHA-256 integrity verification
-* Audit logging
-* Hash-chained audit trail
-* Evidence management
-* Chain of custody
-* Search
-* Dashboard
-* Security testing
-* Deployment
+| Feature | Status |
+|---------|--------|
+| JWT Authentication | ✅ |
+| bcrypt Password Hashing | ✅ |
+| Role-Based Access Control (4 roles) | ✅ |
+| Case CRUD | ✅ |
+| Document Upload | ✅ |
+| Document Download | ✅ |
+| SHA-256 Integrity Verification | ✅ |
+| Document Versioning | ✅ |
+| Hash-Chained Audit Logs | ✅ |
+| Security Events (auto-generated) | ✅ |
+| AI Document Classifier | ✅ |
+| Frontend (React + Vite) | ✅ |
+| Dashboard with Real Stats | ✅ |
+| Audit Logs UI | ✅ |
+| Security Events UI with Resolve | ✅ |
+| Demo Credentials Auto-fill | ✅ |
+| Persistent File Storage (BYTEA) | ✅ |
+| Auto-Seed on Startup | ✅ |
+| Full Cloud Deployment | ✅ |
+| Health Monitoring (UptimeRobot) | ✅ |
 
-### P1 — Only If Time Permits
+### Planned (P1 / P2)
 
-* OCR
-* Extracted-text search
+* OCR / extracted-text search
 * Advanced filters
-* Document preview
-* Security alerts
-
-### P2 — Future
-
-* Blockchain-backed verification
-* Advanced AI
-* Intelligent document classification
-* Advanced forensic analytics
+* Document preview in-browser
 * Digital signatures
+* Blockchain-backed verification
 * Government API integration
-* Enterprise infrastructure
+* Mobile application
+* Advanced forensic analytics
 
 ---
 
 ## 🚫 MVP Limitations
 
-KavachDocs is an **SIH prototype/MVP**.
+KavachDocs is an **SIH prototype / MVP**.
 
 It does not currently claim:
-
 * Production government deployment
 * Legal certification
-* Real police/MHA database integration
+* Real police / MHA database integration
 * Legal authenticity based solely on SHA-256
 * Production blockchain infrastructure
 * Handling real classified or sensitive investigation records
 
-Official integrations would require appropriate APIs, credentials, approvals, infrastructure and security compliance.
+Official integrations would require appropriate APIs, credentials, approvals, infrastructure, and security compliance.
 
 ---
 
@@ -584,7 +526,7 @@ Official integrations would require appropriate APIs, credentials, approvals, in
 
 ```bash
 git clone <YOUR_REPOSITORY_URL>
-cd kavachdocs
+cd SIH26190_KavachDocs
 ```
 
 ### Backend
@@ -592,82 +534,58 @@ cd kavachdocs
 ```bash
 cd backend
 python -m venv venv
-```
-
-Windows:
-
-```bash
-venv\Scripts\activate
-```
-
-Install dependencies:
-
-```bash
+venv\Scripts\activate         # Windows
 pip install -r requirements.txt
+uvicorn main:app --reload --port 8000
 ```
 
-Run:
-
-```bash
-uvicorn app.main:app --reload
-```
-
-API documentation:
-
-```text
-http://127.0.0.1:8000/docs
-```
+API docs: `http://127.0.0.1:8000/docs`
 
 ### Frontend
 
 ```bash
-cd frontend
+cd Frontend
 npm install
 npm run dev
 ```
+
+Frontend runs at: `http://localhost:5173`
 
 ---
 
 ## 🔐 Environment Variables
 
-Create a local `.env` file.
-
-Example:
+Create `backend/.env`:
 
 ```env
-DATABASE_URL=
-JWT_SECRET=
-JWT_ALGORITHM=
-ACCESS_TOKEN_EXPIRE_MINUTES=
-STORAGE_PATH=
+SECRET_KEY=your-secret-key
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=480
+DATABASE_URL=sqlite:///./kavachdocs.db
+STORAGE_PATH=./storage
 ```
 
-**Never commit `.env` to GitHub.**
+Create `Frontend/.env`:
 
-Use `.env.example` for configuration structure.
+```env
+VITE_API_URL=http://localhost:8000
+```
+
+**Never commit `.env` to GitHub.** Use `.env.example` for structure.
 
 ---
 
 ## 🧪 Testing
 
 Basic testing includes:
-
 * Authentication testing
 * RBAC testing
 * Unauthorized-access testing
 * File validation testing
-* Path traversal testing
 * Document integrity testing
 * Audit-chain verification
-* Evidence-transfer testing
 
-Backend tests:
-
-```bash
-pytest
-```
-
-API testing can also be performed using FastAPI Swagger/OpenAPI.
+API testing via FastAPI Swagger UI: `/docs`
 
 ---
 
@@ -688,12 +606,20 @@ API testing can also be performed using FastAPI Swagger/OpenAPI.
           │   FastAPI   │
           └──────┬──────┘
                  │
-          ┌──────┴──────┐
-          ▼             ▼
-   ┌────────────┐  ┌─────────────┐
-   │ PostgreSQL │  │File Storage │
-   └────────────┘  └─────────────┘
+                 ▼
+          ┌─────────────┐
+          │    Neon     │
+          │ PostgreSQL  │
+          │ + BYTEA     │
+          └─────────────┘
 ```
+
+| Component | Platform | Purpose |
+|-----------|----------|---------|
+| Frontend | Vercel | Static React build (CDN) |
+| Backend | Render | FastAPI service |
+| Database | Neon | Managed PostgreSQL |
+| Monitor | UptimeRobot | Keeps Render warm via `/health` pings |
 
 ---
 
@@ -702,7 +628,6 @@ API testing can also be performed using FastAPI Swagger/OpenAPI.
 KavachDocs can evolve into a complete secure digital ecosystem for investigation and legal workflows.
 
 Possible future capabilities:
-
 * Government identity integration
 * Digital signatures
 * Blockchain-backed verification
@@ -726,14 +651,13 @@ Developed for **Smart India Hackathon 2026**.
 
 ## 📄 License
 
-This project is developed as an academic and hackathon prototype.
-
-See `LICENSE` for details.
+Developed as an academic and hackathon prototype. See `LICENSE` for details.
 
 ---
 
 ## ⚠️ Disclaimer
 
-KavachDocs is a **Smart India Hackathon prototype** created for demonstration and evaluation purposes.
+KavachDocs is a **Smart India Hackathon prototype** created for demonstration and evaluation.
 
-All demonstration records should be fictional/synthetic. The system should not be used for real sensitive legal, police, investigation, forensic or classified information without appropriate security audits, authorization, compliance and official approval.
+All demonstration records are fictional / synthetic. The system must not be used for real sensitive legal, police, investigation, forensic, or classified information without appropriate security audits, authorization, compliance, and official approval.
+```
