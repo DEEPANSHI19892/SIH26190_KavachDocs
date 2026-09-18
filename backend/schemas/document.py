@@ -2,14 +2,16 @@ from pydantic import BaseModel
 from datetime import datetime
 from typing import Optional
 
+
 class DocumentResponse(BaseModel):
     id: int
     case_id: int
     case_number: Optional[str] = None
     title: str
     document_type: str
-    description: Optional[str]
-    file_path: Optional[str] = None
+    description: Optional[str] = None
+    file_name: Optional[str] = None
+    file_mime: Optional[str] = None
     file_size: int
     sha256_hash: str
     current_version: int
@@ -19,13 +21,15 @@ class DocumentResponse(BaseModel):
     class Config:
         from_attributes = True
 
+
 class VersionResponse(BaseModel):
     id: int
     document_id: int
     version_number: int
+    file_name: Optional[str] = None
     sha256_hash: str
     uploaded_by: int
-    reason: Optional[str]
+    reason: Optional[str] = None
     created_at: datetime
 
     class Config:

@@ -29,6 +29,16 @@ def generate_sha256(file_path: str) -> str:
             sha256_hash.update(byte_block)
     return sha256_hash.hexdigest()
 
+def generate_sha256_from_bytes(data: bytes) -> str:
+    """Generate SHA-256 hash from raw bytes"""
+    return hashlib.sha256(data).hexdigest()
+
+
+def verify_integrity_bytes(data: bytes, expected_hash: str) -> bool:
+    """Verify integrity by hashing bytes and comparing"""
+    current_hash = generate_sha256_from_bytes(data)
+    return current_hash == expected_hash
+
 def verify_integrity(file_path: str, expected_hash: str) -> bool:
     """Verify file integrity by comparing SHA-256 hash"""
     current_hash = generate_sha256(file_path)
